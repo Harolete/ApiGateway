@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Author;
+use App\Services\AurhorService;
 use App\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,13 +15,18 @@ class AuthorController extends Controller
     use ApiResponder;
 
     /**
+     * El servicio para consumir AuthorService
+     * @var
+     */
+    public $authorService;
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(AurhorService $authorService)
     {
-        //
+        $this->authorService = $authorService;
     }
 
     /**
