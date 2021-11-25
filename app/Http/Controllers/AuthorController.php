@@ -19,10 +19,11 @@ class AuthorController extends Controller
      * @var
      */
     public $authorService;
+
     /**
      * Create a new controller instance.
      *
-     * @return void
+     * @param AurhorService $authorService
      */
     public function __construct(AurhorService $authorService)
     {
@@ -35,7 +36,7 @@ class AuthorController extends Controller
      */
     public function index()
     {
-        return $this->successResponse(Author::all());
+        return $this->successResponse($this->authorService->obtainAuthors());
     }
 
     /**
@@ -46,17 +47,9 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'name'=>'required|max:255',
-            'gender'=>'required|max:255|in:male,female',
-            'country'=>'required|max:255'
-        ];
-
-        $this->validate($request, $rules);
-
-        $author = Author::create($request->all());
-
-        return $this->successResponse($author, Response::HTTP_CREATED);
+        return $this->successResponse(
+            $this->authorService->createAuthor($request->all()),
+            Response::HTTP_CREATED);
 
     }
 
@@ -67,9 +60,7 @@ class AuthorController extends Controller
      */
     public function show($author)
     {
-        $author = Author::findOrFail($author);
-
-        return $this->successResponse($author, Response::HTTP_OK);
+        return $this->successResponse($this->authorService->obtainAuthor($author));
     }
 
     /**
@@ -81,27 +72,7 @@ class AuthorController extends Controller
      */
     public function update(Request $request, $author)
     {
-        $rules = [
-            'name'=>'max:255',
-            'gender'=>'max:255|in:male,female',
-            'country'=>'max:255'
-        ];
-
-        $this->validate($request, $rules);
-
-        $author = Author::findOrFail($author);
-
-        $author->fill($request->all());
-
-        if($author->isclean()){
-            return $this->errorResponse('al menos un dato debe cambiar',
-                Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        $author->save();
-
-        return $this->successResponse($author, Response::HTTP_OK);
-
+        return $this->successResponse($this->authorService->editAuthor($request->all(), $author));
     }
 
     /**
@@ -111,11 +82,7 @@ class AuthorController extends Controller
      */
     public function destroy($author)
     {
-        $author = Author::findOrFail($author);
-
-        $author ->delete();
-
-        return $this->successResponse($author, Response::HTTP_OK);
+        return $this->successResponse($this->authorService->deleteAuthor($author));
 
     }
 }

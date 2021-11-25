@@ -13,8 +13,7 @@ trait ApiResponder
      */
     public function successResponse($data, int $code = Response::HTTP_OK)
     {
-
-        return \response()->json($data, $code)->header('Content-Type', 'application/json');
+        return response($data, $code)->header('Content-Type', 'application/json');
     }
 
     /**

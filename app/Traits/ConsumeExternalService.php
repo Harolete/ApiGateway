@@ -2,10 +2,12 @@
 
 namespace App\Traits;
 
-use http\Client;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 trait ConsumeExternalService
 {
+
     /**
      * Send a request to any service
      * @param $method
@@ -13,6 +15,7 @@ trait ConsumeExternalService
      * @param array $formParams
      * @param array $headers
      * @return string
+     * @throws GuzzleException
      */
     public function performRequest($method, $requestUrl, $formParams = [], $headers = [])
     {
