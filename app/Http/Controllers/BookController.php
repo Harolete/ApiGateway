@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Book;
+use App\Services\AurhorService;
 use App\Services\BookService;
 use App\Traits\ApiResponder;
 use Illuminate\Http\JsonResponse;
@@ -21,43 +22,43 @@ class BookController extends Controller
     public $bookService;
 
     /**
+     * El servicio para consumir AuthorService
+     * @var
+     */
+    public $authorService;
+
+    /**
      * Create a new controller instance.
      * @param BookService $bookService
+     * @param AurhorService $authorService
      */
-    public function __construct(BookService $bookService)
+    public function __construct(BookService $bookService, AurhorService $authorService)
     {
         $this->bookService = $bookService;
+        $this->authorService = $authorService;
     }
 
     /**
-     * Retorna una lista de libros
+     * Retorna una lista de autores
      * @return JsonResponse
      */
     public function index()
     {
-        return $this->successResponse(Book::all());
+        return $this->successResponse($this->bookService->obtainBooks());
     }
 
     /**
-     * Crea una instancia de Book
+     * Crea una instancia de Author
      * @param Request $request
      * @return JsonResponse
      * @throws ValidationException
      */
     public function store(Request $request)
     {
-        $rules = [
-            'title'         =>'required|max:255',
-            'description'   =>'required|max:255',
-            'price'         =>'required|min:1',
-            'author_id'     =>'required|min:1'
-        ];
-
-        $this->validate($request, $rules);
-
-        $book = Book::create($request->all());
-
-        return $this->successResponse($book, Response::HTTP_CREATED);
+        $this->authorService->obtainAuthor($request->author_id);
+        return $this->successResponse(
+            $this->bookService->createBook($request->all()),
+            Response::HTTP_CREATED);
 
     }
 
@@ -66,11 +67,9 @@ class BookController extends Controller
      * @param  $author
      * @return JsonResponse
      */
-    public function show($book)
+    public function show($author)
     {
-        $book = Book::findOrFail($book);
-
-        return $this->successResponse($book, Response::HTTP_OK);
+        return $this->successResponse($this->bookService->obtainBook($author));
     }
 
     /**
@@ -80,44 +79,19 @@ class BookController extends Controller
      * @return JsonResponse
      * @throws ValidationException
      */
-    public function update(Request $request, $book)
+    public function update(Request $request, $author)
     {
-        $rules = [
-            'title'         =>'max:255',
-            'description'   =>'max:255',
-            'price'         =>'min:1',
-            'author_id'     =>'min:1'
-        ];
-
-        $this->validate($request, $rules);
-
-        $book = Book::findOrFail($book);
-
-        $book->fill($request->all());
-
-        if($book->isclean()){
-            return $this->errorResponse('al menos un dato debe cambiar',
-                Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        $book->save();
-
-        return $this->successResponse($book, Response::HTTP_OK);
-
+        return $this->successResponse($this->bookService->editBook($request->all(), $author));
     }
 
     /**
      * Retorna un author especifico
      * @param  $author
-     * @return JsonResponse
+     * @return  Illuminate\Http\Response
      */
-    public function destroy($book)
+    public function destroy($author)
     {
-        $book = Book::findOrFail($book);
-
-        $book ->delete();
-
-        return $this->successResponse($book, Response::HTTP_OK);
+        return $this->successResponse($this->bookService->deleteBook($author));
 
     }
 }

@@ -33,6 +33,6 @@ trait ApiResponder
      */
     public function errorMessage(string $message, int $code)
     {
-        return \response()->json($message, $code)->header('Content-Type', 'application/json');
+        return \response($message, $code)->header('Content-Type', 'application/json');
     }
 }
