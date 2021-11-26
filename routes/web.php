@@ -10,32 +10,35 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-/**
- * Authors routes
- */
-$router->get('/authors', 'AuthorController@index');
 
-$router->post('/authors', 'AuthorController@store');
+$router->group(['middleware' => 'client.credentials'], function() use ($router){
+    /**
+     * Authors routes
+     */
+    $router->get('/authors', 'AuthorController@index');
 
-$router->get('/authors/{author}', 'AuthorController@show');
+    $router->post('/authors', 'AuthorController@store');
 
-$router->put('/authors/{author}', 'AuthorController@update');
+    $router->get('/authors/{author}', 'AuthorController@show');
 
-$router->patch('/authors/{author}', 'AuthorController@update');
+    $router->put('/authors/{author}', 'AuthorController@update');
 
-$router->delete('/authors/{author}', 'AuthorController@destroy');
+    $router->patch('/authors/{author}', 'AuthorController@update');
 
-/**
- * Books routes
- */
-$router->get('/books', 'BookController@index');
+    $router->delete('/authors/{author}', 'AuthorController@destroy');
 
-$router->post('/books', 'BookController@store');
+    /**
+     * Books routes
+     */
+    $router->get('/books', 'BookController@index');
 
-$router->get('/books/{book}', 'BookController@show');
+    $router->post('/books', 'BookController@store');
 
-$router->put('/books/{book}', 'BookController@update');
+    $router->get('/books/{book}', 'BookController@show');
 
-$router->patch('/books/{book}', 'BookController@update');
+    $router->put('/books/{book}', 'BookController@update');
 
-$router->delete('/books/{book}', 'BookController@destroy');
+    $router->patch('/books/{book}', 'BookController@update');
+
+    $router->delete('/books/{book}', 'BookController@destroy');
+});
