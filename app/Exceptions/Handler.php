@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function render($request, Exception $exception)
     {
@@ -81,12 +81,6 @@ class Handler extends ExceptionHandler
                 Response::HTTP_UNPROCESSABLE_ENTITY );
         }
 
-        if(env('APP_DEBUG', false)){
-            return  parent::render($request, $exception);
-        }
-
-        return  $this->errorResponse('Unexpected error, try later',
-            Response::HTTP_INTERNAL_SERVER_ERROR );
         if($exception instanceof ClientException)
         {
             $message = $exception -> getResponse()->getBody();
@@ -94,6 +88,12 @@ class Handler extends ExceptionHandler
             return $this->errorMessage($message,$code);
         }
 
-        return parent::render($request, $exception);
+        if(env('APP_DEBUG', false)){
+            return  parent::render($request, $exception);
+        }
+
+
+        return  $this->errorResponse('Unexpected error, try later',
+            Response::HTTP_INTERNAL_SERVER_ERROR );
     }
 }
